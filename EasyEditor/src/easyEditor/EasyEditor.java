@@ -1,3 +1,4 @@
+package easyEditor;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -8,7 +9,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -16,6 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
@@ -26,6 +28,8 @@ public class EasyEditor extends JFrame {
 	JTextPane textPane;
 	// 書式とかいろいろいじれる（らしい）
 	StyledDocument doc;
+	// TODO
+	UpdateCommand command;
 	
 	public EasyEditor() {
 		
@@ -33,13 +37,19 @@ public class EasyEditor extends JFrame {
 		toolBar.setFloatable(false);
 		getContentPane().add(toolBar, BorderLayout.NORTH);
 		
-		JButton btnLoad = new JButton("Open");
+		JButton btnLoad = new JButton("  Open  ");
 		btnLoad.addActionListener(new OpenButtonAction());
 		toolBar.add(btnLoad);
 		
-		JButton btnSave = new JButton("Save");
+		JButton btnSave = new JButton("  Save  ");
 		btnSave.addActionListener(new SaveButtonAction());
 		toolBar.add(btnSave);
+		
+		JButton btnUndo = new JButton("  Undo  ");
+		toolBar.add(btnUndo);
+		
+		JButton btnRedo = new JButton("  Redo  ");
+		toolBar.add(btnRedo);
 		
 		textPane = new JTextPane();
 		doc = textPane.getStyledDocument();
@@ -75,6 +85,9 @@ public class EasyEditor extends JFrame {
 					}
 					textPane.setText("");
 					doc.insertString(0, text.toString(), null);
+
+					// TODO
+					command = new UpdateCommand(textPane, textPane.getText(), textPane.getText());
 					
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
@@ -111,6 +124,23 @@ public class EasyEditor extends JFrame {
 				}
 			}
 		}
+	}
+	
+	// テキストが編集されたとき
+	class TextChanged implements DocumentListener {
+
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+		}
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+		}
+		
 	}
 	
 	
