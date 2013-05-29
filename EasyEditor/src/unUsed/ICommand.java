@@ -1,4 +1,4 @@
-package easyEditor;
+package unUsed;
 
 public interface ICommand {
 

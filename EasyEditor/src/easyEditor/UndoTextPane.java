@@ -11,15 +11,8 @@ import javax.swing.undo.UndoManager;
 
 public class UndoTextPane extends JTextPane implements UndoableEditListener, KeyListener {
 
+	// Undo,Redoを簡単に実装できる凄いやつ
 	UndoManager uManager = new UndoManager();
-
-	@Override
-	public void undoableEditHappened(UndoableEditEvent e) {
-		// TODO
-		uManager.addEdit(e.getEdit());
-	}
-	
-// UndoableEditListener --------------------------------------------------
 
 	public UndoTextPane() {
 		Document doc = this.getDocument();
@@ -27,23 +20,40 @@ public class UndoTextPane extends JTextPane implements UndoableEditListener, Key
 		this.addKeyListener(this);
 	}
 
-// KeyListener --------------------------------------------------
+	// 編集内容を消去する
+	public void clearHistory() {
+		uManager.discardAllEdits();
+	}
+
+// UndoableEditListener ---------------------------------------
+
+	// テキストの内容が変わったとき
+	@Override
+	public void undoableEditHappened(UndoableEditEvent e) {
+		// 編集内容を記録
+		uManager.addEdit(e.getEdit());
+	}
+
+// KeyListener -------------------------------------------------
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
 
+	// キー入力時
 	@Override
 	public void keyPressed(KeyEvent e) {
 
 		int key = e.getKeyCode();
-		
+
 		if(e.isControlDown() && uManager.canUndo()) {
-			if(key == KeyEvent.VK_Z) {
+			// C-z でUndo実行
+			if(key == KeyEvent.VK_Z && uManager.canUndo()) {
 				uManager.undo();
 				e.consume();
 			}
-			
+
+			// C-y でRedo実行
 			if(key == KeyEvent.VK_Y && uManager.canRedo()) {
 				uManager.redo();
 				e.consume();
@@ -54,16 +64,20 @@ public class UndoTextPane extends JTextPane implements UndoableEditListener, Key
 	@Override
 	public void keyReleased(KeyEvent e) {
 	}
-	
+
 // ButtonEvent --------------------------------------------------
-	
+
 	public void undo() {
+		// Undoが可能なら実行
 		if(uManager.canUndo()) {
-			uManager.undo()
+			uManager.undo();
 		}
 	}
-	
+
 	public void redo() {
-		
+		// Redoが可能なら実行
+		if(uManager.canRedo()) {
+			uManager.redo();
+		}
 	}
 }

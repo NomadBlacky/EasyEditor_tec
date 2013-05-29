@@ -3,8 +3,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -16,10 +14,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.JToolBar;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
@@ -27,14 +22,11 @@ import javax.swing.text.StyledDocument;
 public class EasyEditor extends JFrame {
 
 	// テキストフィールド
-	JTextPane textPane;
-	// 書式とかいろいろいじれる（らしい）
-	StyledDocument doc;
-	// TODO
-	UpdateCommand uCommand;
-	CommandInvoker cInvoker;
+	UndoTextPane textPane;
 
 	public EasyEditor() {
+
+		// コンポーネントの配置とリスナーの設定
 
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
@@ -49,18 +41,17 @@ public class EasyEditor extends JFrame {
 		toolBar.add(btnSave);
 
 		JButton btnUndo = new JButton("  Undo  ");
+		btnUndo.addActionListener(new UndoButtonAction());
 		toolBar.add(btnUndo);
 
 		JButton btnRedo = new JButton("  Redo  ");
+		btnRedo.addActionListener(new RedoButtonAction());
 		toolBar.add(btnRedo);
 
-		textPane = new JTextPane();
-		doc = textPane.getStyledDocument();
+		textPane = new UndoTextPane();
 		JScrollPane scrollPane = new JScrollPane(textPane);
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		uCommand = new UpdateCommand(textPane, "", "");
-		cInvoker = new CommandInvoker();
 	}
 
 	// "Open"ボタン押下時
@@ -88,17 +79,14 @@ public class EasyEditor extends JFrame {
 					while (scan.hasNext()) {
 						text.append(scan.nextLine().concat("\n"));
 					}
-					textPane.setText("");
-					doc.insertString(0, text.toString(), null);
 
-					// TODO
-					uCommand = new UpdateCommand(textPane, textPane.getText(), textPane.getText());
+					// テキストフィールドに表示
+					textPane.setText(text.toString());
+					// 編集履歴をクリア
+					textPane.clearHistory();
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
-					setTitle("EasyEditor");
-				} catch (BadLocationException e1) {
-					JOptionPane.showMessageDialog(null, "読み込みに失敗しました。", "エラー", JOptionPane.WARNING_MESSAGE);
 					setTitle("EasyEditor");
 				}
 			}
@@ -119,6 +107,17 @@ public class EasyEditor extends JFrame {
 
 				// 保存するファイル（パス）を取得
 				File file = jChooser.getSelectedFile();
+
+				// ファイルが存在する（上書き保存の）場合
+				if(file.exists()) {
+					// 確認メッセージを表示
+					int opt = JOptionPane.showConfirmDialog(null, file.getName().concat("はすでに存在します。上書きしますか？"),
+							"上書き保存", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if(opt != JOptionPane.OK_OPTION) {
+						// OK が選択されなければ何もしない
+						return;
+					}
+				}
 				try {
 					// テキストフィールドの内容を書き込む
 					FileWriter fw = new FileWriter(file);
@@ -131,61 +130,23 @@ public class EasyEditor extends JFrame {
 		}
 	}
 
+	// "Undo"ボタン押下時
 	class UndoButtonAction implements ActionListener {
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
-			cInvoker.undo();
+			// Undo実行
+			textPane.undo();
 		}
-
 	}
 
+	// "Redo"ボタン押下時
 	class RedoButtonAction implements ActionListener {
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
-			cInvoker.redo();
+			// Redo実行
+			textPane.redo();
 		}
-
 	}
-
-	// テキストが編集されたとき
-	class TextChanged implements DocumentListener, KeyListener {
-
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			//cInvoker.invoke(command);
-		}
-
-		@Override
-		public void insertUpdate(DocumentEvent e) {
-		}
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-		}
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-
-			cInvoker.invoke(uCommand);
-		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
-
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
-
-		}
-
-	}
-
 
 	public static void main(String[] args) {
 
