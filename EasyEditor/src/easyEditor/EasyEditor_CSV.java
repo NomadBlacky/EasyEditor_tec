@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -13,15 +11,17 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
+import javax.swing.table.DefaultTableModel;
 
 
-public class EasyEditor extends JFrame {
+public class EasyEditor_CSV extends JFrame {
+	
+	private JTable table;
+	private DefaultTableModel tableModel;
 
-	// テキストフィールド
-	UndoTextPane textPane;
-
-	public EasyEditor() {
+	public EasyEditor_CSV() {
 
 		// コンポーネントの配置とリスナーの設定
 
@@ -34,20 +34,30 @@ public class EasyEditor extends JFrame {
 		toolBar.add(btnLoad);
 
 		JButton btnSave = new JButton("  Save  ");
-		btnSave.addActionListener(new SaveButtonAction());
+//		btnSave.addActionListener(new SaveButtonAction());
 		toolBar.add(btnSave);
 
 		JButton btnUndo = new JButton("  Undo  ");
-		btnUndo.addActionListener(new UndoButtonAction());
+//		btnUndo.addActionListener(new UndoButtonAction());
 		toolBar.add(btnUndo);
 
 		JButton btnRedo = new JButton("  Redo  ");
-		btnRedo.addActionListener(new RedoButtonAction());
+//		btnRedo.addActionListener(new RedoButtonAction());
 		toolBar.add(btnRedo);
-
-		textPane = new UndoTextPane();
-		JScrollPane scrollPane = new JScrollPane(textPane);
+		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		
+		table = new JTable(new DefaultTableModel(
+			new Object[][] {
+				{null, null, null, null},
+				{null, null, null, null},
+				{null, null, null, null},
+			},
+			new String[] {
+				"New column", "New column", "New column", "New column"
+			}
+		));
+		scrollPane.setViewportView(table);
 
 	}
 
@@ -58,6 +68,7 @@ public class EasyEditor extends JFrame {
 
 			// ファイル選択ダイアログを表示
 			JFileChooser jChooser = new JFileChooser();
+			jChooser.setCurrentDirectory(new File("."));
 			int selected = jChooser.showOpenDialog(null);
 
 			// 「開く」ボタン押下時
@@ -69,18 +80,23 @@ public class EasyEditor extends JFrame {
 
 				try {
 					Scanner scan = new Scanner(file);
-					// 文字列の連結が高速なStringBuilderを使用
-					StringBuilder text = new StringBuilder();
-
+					String[] tableName = null;
+					DefaultTableModel defModel = null;
+					boolean first = true;
 					// ファイルを読み込む
 					while (scan.hasNext()) {
-						text.append(scan.nextLine().concat("\n"));
+						if(first) {
+							first = false;
+							tableName = scan.nextLine().split(",");
+							defModel = new DefaultTableModel(tableName, 0);
+						}
+						else {
+							String[] line = scan.nextLine().split(",");
+							defModel.addRow(line);
+						}
 					}
-
-					// テキストフィールドに表示
-					textPane.setText(text.toString());
-					// 編集履歴をクリア
-					textPane.clearHistory();
+					
+					tableModel = defModel;
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
@@ -90,6 +106,9 @@ public class EasyEditor extends JFrame {
 		}
 	}
 
+	
+/*
+	
 	// "Save"ボタン押下時
 	class SaveButtonAction implements ActionListener {
 		@Override
@@ -144,5 +163,6 @@ public class EasyEditor extends JFrame {
 			textPane.redo();
 		}
 	}
-
+*/
+	
 }
