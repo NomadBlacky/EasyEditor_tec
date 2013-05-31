@@ -47,6 +47,7 @@ public class UndoTextPane extends JTextPane implements UndoableEditListener, Key
 		int key = e.getKeyCode();
 
 		if(e.isControlDown() && uManager.canUndo()) {
+
 			// C-z でUndo実行
 			if(key == KeyEvent.VK_Z && uManager.canUndo()) {
 				uManager.undo();
