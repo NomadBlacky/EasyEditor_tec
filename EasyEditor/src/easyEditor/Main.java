@@ -2,6 +2,8 @@ package easyEditor;
 
 import java.awt.Dimension;
 
+import addressBook.AddressBook;
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -13,7 +15,7 @@ public class Main {
 			easyEditor.setVisible(true);
 		*/
 		
-		EasyEditor_CSV editCsv = new EasyEditor_CSV();
+		AddressBook editCsv = new AddressBook();
 		editCsv.setTitle("CSV-mode");
 		editCsv.setSize(new Dimension(600,400));
 		editCsv.setVisible(true);

@@ -1,4 +1,4 @@
-package easyEditor;
+package addressBook;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,12 +16,12 @@ import javax.swing.JToolBar;
 import javax.swing.table.DefaultTableModel;
 
 
-public class EasyEditor_CSV extends JFrame {
+public class AddressBook extends JFrame {
 	
 	private JTable table;
 	private DefaultTableModel tableModel;
 
-	public EasyEditor_CSV() {
+	public AddressBook() {
 
 		// コンポーネントの配置とリスナーの設定
 
@@ -47,16 +47,10 @@ public class EasyEditor_CSV extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 		
-		table = new JTable(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null, null},
-				{null, null, null, null},
-				{null, null, null, null},
-			},
-			new String[] {
-				"New column", "New column", "New column", "New column"
-			}
-		));
+		String[] names = { "hoge", "foo", "huga" };
+		tableModel = new DefaultTableModel(names, 0);
+		
+		table = new JTable(tableModel);
 		scrollPane.setViewportView(table);
 
 	}
@@ -81,22 +75,21 @@ public class EasyEditor_CSV extends JFrame {
 				try {
 					Scanner scan = new Scanner(file);
 					String[] tableName = null;
-					DefaultTableModel defModel = null;
-					boolean first = true;
+					
+					if(!scan.hasNext()) {
+						scan.close();
+						return;
+					}
+					tableName = scan.nextLine().split(",");
+					tableModel = new DefaultTableModel(tableName, 0);
+
 					// ファイルを読み込む
 					while (scan.hasNext()) {
-						if(first) {
-							first = false;
-							tableName = scan.nextLine().split(",");
-							defModel = new DefaultTableModel(tableName, 0);
-						}
-						else {
-							String[] line = scan.nextLine().split(",");
-							defModel.addRow(line);
-						}
+						String[] line = scan.nextLine().split(",");
+						tableModel.addRow(line);
 					}
 					
-					tableModel = defModel;
+					scan.close();
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
