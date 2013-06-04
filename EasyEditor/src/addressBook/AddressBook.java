@@ -17,9 +17,10 @@ import javax.swing.table.DefaultTableModel;
 
 
 public class AddressBook extends JFrame {
-	
+
 	private JTable table;
-	private DefaultTableModel tableModel;
+	private DefaultTableModel model;
+	private String delm = ",";
 
 	public AddressBook() {
 
@@ -46,11 +47,10 @@ public class AddressBook extends JFrame {
 		toolBar.add(btnRedo);
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
-		
-		String[] names = { "hoge", "foo", "huga" };
-		tableModel = new DefaultTableModel(names, 0);
-		
-		table = new JTable(tableModel);
+
+		model = new DefaultTableModel();
+
+		table = new JTable(model);
 		scrollPane.setViewportView(table);
 
 	}
@@ -74,21 +74,29 @@ public class AddressBook extends JFrame {
 
 				try {
 					Scanner scan = new Scanner(file);
-					String[] tableName = null;
-					
+					String[] colName = null;
+
+					// ファイルを読み込む
 					if(!scan.hasNext()) {
 						scan.close();
 						return;
 					}
-					tableName = scan.nextLine().split(",");
-					tableModel = new DefaultTableModel(tableName, 0);
-
-					// ファイルを読み込む
-					while (scan.hasNext()) {
-						String[] line = scan.nextLine().split(",");
-						tableModel.addRow(line);
+					colName = scan.nextLine().split(delm);
+					for (String s : colName) {
+						model.addColumn(s);
 					}
-					
+
+					while (scan.hasNext()) {
+						String[] line = scan.nextLine().split(delm);
+						int nowCol = model.getColumnCount();
+						if(line.length > nowCol) {
+							for(int i = nowCol; i < line.length; i++) {
+								model.addColumn(null);
+							}
+						}
+						model.addRow(line);
+					}
+
 					scan.close();
 
 				} catch (FileNotFoundException e1) {
@@ -99,9 +107,9 @@ public class AddressBook extends JFrame {
 		}
 	}
 
-	
+
 /*
-	
+
 	// "Save"ボタン押下時
 	class SaveButtonAction implements ActionListener {
 		@Override
@@ -157,5 +165,5 @@ public class AddressBook extends JFrame {
 		}
 	}
 */
-	
+
 }
