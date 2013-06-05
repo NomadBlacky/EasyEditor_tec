@@ -37,20 +37,22 @@ public class AddressBook extends JFrame {
 		JButton btnSave = new JButton("  Save  ");
 //		btnSave.addActionListener(new SaveButtonAction());
 		toolBar.add(btnSave);
-
-		JButton btnUndo = new JButton("  Undo  ");
-//		btnUndo.addActionListener(new UndoButtonAction());
-		toolBar.add(btnUndo);
-
-		JButton btnRedo = new JButton("  Redo  ");
-//		btnRedo.addActionListener(new RedoButtonAction());
-		toolBar.add(btnRedo);
+		
+		JButton btnHo = new JButton("  hoge  ");
+		btnHo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				EditFrame editFrame = new EditFrame();
+				editFrame.showFrame(model);
+			}
+		});
+		toolBar.add(btnHo);
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
 		model = new DefaultTableModel();
-
 		table = new JTable(model);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.setAutoCreateRowSorter(true);
 		scrollPane.setViewportView(table);
 
 	}
@@ -146,24 +148,7 @@ public class AddressBook extends JFrame {
 			}
 		}
 	}
-
-	// "Undo"ボタン押下時
-	class UndoButtonAction implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// Undo実行
-			textPane.undo();
-		}
-	}
-
-	// "Redo"ボタン押下時
-	class RedoButtonAction implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// Redo実行
-			textPane.redo();
-		}
-	}
+	
 */
-
+	
 }
