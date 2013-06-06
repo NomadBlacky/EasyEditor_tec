@@ -20,6 +20,7 @@ public class AddressBook extends JFrame {
 
 	private JTable table;
 	private DefaultTableModel model;
+	/** 区切り文字(delimiter) */
 	private String delm = ",";
 
 	public AddressBook() {
@@ -37,27 +38,42 @@ public class AddressBook extends JFrame {
 		JButton btnSave = new JButton("  Save  ");
 //		btnSave.addActionListener(new SaveButtonAction());
 		toolBar.add(btnSave);
-		
-		JButton btnHo = new JButton("  hoge  ");
-		btnHo.addActionListener(new ActionListener() {
+
+		JButton btnEdit = new JButton("  Edit  ");
+		btnEdit.addActionListener(new ActionListener() {
+
+			// 編集用ウィンドウを表示する
 			public void actionPerformed(ActionEvent e) {
-				EditFrame editFrame = new EditFrame();
-				editFrame.showFrame(model);
+				EditFrame editFrame = new EditFrame(model);
+				// editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				// ↑これを書くと呼び出し元のフレームまで閉じてしまう(プログラムが終了する)ので書かない
+				editFrame.setVisible(true);
 			}
 		});
-		toolBar.add(btnHo);
+
+		toolBar.add(btnEdit);
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		model = new DefaultTableModel();
+		model = new DefaultTableModel() {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				// すべてのセルを編集不可にする
+				return false;
+			}
+		};
+
 		table = new JTable(model);
+		// 列の入れ替えを不可にする
 		table.getTableHeader().setReorderingAllowed(false);
+		// 列見出しをクリックでソートを有効にする
 		table.setAutoCreateRowSorter(true);
 		scrollPane.setViewportView(table);
 
 	}
 
-	// "Open"ボタン押下時
+// "Open"ボタン押下時 --------------------------------------------------
+
 	class OpenButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -75,14 +91,17 @@ public class AddressBook extends JFrame {
 				setTitle(String.format("%s - %s", file.getName(), file.getPath()));
 
 				try {
+					// ファイルを読み込む
 					Scanner scan = new Scanner(file);
 					String[] colName = null;
 
-					// ファイルを読み込む
 					if(!scan.hasNext()) {
+						// 空ファイルなら抜ける
 						scan.close();
 						return;
 					}
+
+					// 先頭行を列見出しとして列を作成
 					colName = scan.nextLine().split(delm);
 					for (String s : colName) {
 						model.addColumn(s);
@@ -92,10 +111,12 @@ public class AddressBook extends JFrame {
 						String[] line = scan.nextLine().split(delm);
 						int nowCol = model.getColumnCount();
 						if(line.length > nowCol) {
+							// 列が足りなければ追加する
 							for(int i = nowCol; i < line.length; i++) {
 								model.addColumn(null);
 							}
 						}
+						// データ一件追加
 						model.addRow(line);
 					}
 
@@ -103,7 +124,7 @@ public class AddressBook extends JFrame {
 
 				} catch (FileNotFoundException e1) {
 					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
-					setTitle("EasyEditor");
+					setTitle("AddressBook");
 				}
 			}
 		}
@@ -112,7 +133,8 @@ public class AddressBook extends JFrame {
 
 /*
 
-	// "Save"ボタン押下時
+// "Save"ボタン押下時 --------------------------------------------------
+
 	class SaveButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -148,7 +170,7 @@ public class AddressBook extends JFrame {
 			}
 		}
 	}
-	
+
 */
-	
+
 }

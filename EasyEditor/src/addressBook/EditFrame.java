@@ -25,8 +25,9 @@ public class EditFrame extends JFrame {
 
 	private TableModel model;
 	private JTextField textField;
+	private JTextField textField_1;
 
-	public EditFrame() {
+	public EditFrame(TableModel tmodel) {
 		this.setSize(500,300);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -34,69 +35,127 @@ public class EditFrame extends JFrame {
 		getContentPane().add(panel, BorderLayout.SOUTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnNewButton = new JButton("←戻る(B)");
-		panel.add(btnNewButton);
+		JButton btnPrev = new JButton("←戻る(B)");
+		panel.add(btnPrev);
 
-		JButton btnNewButton_1 = new JButton("次へ→(N)");
-		panel.add(btnNewButton_1);
+		JButton btnNext = new JButton("次へ→(N)");
+		panel.add(btnNext);
 
-		JButton btnNewButton_2 = new JButton("新規登録(S)");
-		panel.add(btnNewButton_2);
+		JButton btnEntry = new JButton("新規登録(S)");
+		panel.add(btnEntry);
 
-		JButton btnd = new JButton("削除(D)");
-		panel.add(btnd);
+		JButton btnDelete = new JButton("削除(D)");
+		panel.add(btnDelete);
 
-		JButton btnNewButton_3 = new JButton("終了(E)");
-		btnNewButton_3.addActionListener(new ActionListener() {
+		JButton btnExit = new JButton("終了(E)");
+		btnExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 			}
 		});
-		panel.add(btnNewButton_3);
+		panel.add(btnExit);
 
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		scrollPane.setViewportView(panel_1);
-		GridBagLayout gbl_panel_1 = new GridBagLayout();
-		gbl_panel_1.columnWidths = new int[]{0, 0, 0};
-		gbl_panel_1.rowHeights = new int[]{0, 0};
-		gbl_panel_1.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
-		gbl_panel_1.rowWeights = new double[]{0.0, Double.MIN_VALUE};
-		panel_1.setLayout(gbl_panel_1);
+		JPanel panelMain = new JPanel();
+		panelMain.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		scrollPane.setViewportView(panelMain);
+		GridBagLayout gbl_panelMain = new GridBagLayout();
+		gbl_panelMain.columnWidths = new int[]{0, 0, 0};
+		gbl_panelMain.rowHeights = new int[]{0, 0, 0};
+		gbl_panelMain.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
+		gbl_panelMain.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		panelMain.setLayout(gbl_panelMain);
 
 		JLabel lblNewLabel = new JLabel("New label");
 		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
 		gbc_lblNewLabel.ipady = 2;
 		gbc_lblNewLabel.ipadx = 2;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
 		gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
 		gbc_lblNewLabel.gridx = 0;
 		gbc_lblNewLabel.gridy = 0;
-		panel_1.add(lblNewLabel, gbc_lblNewLabel);
+		panelMain.add(lblNewLabel, gbc_lblNewLabel);
 
 		textField = new JTextField();
 		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.insets = new Insets(0, 0, 5, 0);
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.gridx = 1;
 		gbc_textField.gridy = 0;
-		panel_1.add(textField, gbc_textField);
+		panelMain.add(textField, gbc_textField);
 		textField.setColumns(10);
 
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(null);
-		getContentPane().add(panel_2, BorderLayout.NORTH);
+		JLabel lblNewLabel_1 = new JLabel("New label");
+		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
+		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
+		gbc_lblNewLabel_1.insets = new Insets(0, 0, 0, 5);
+		gbc_lblNewLabel_1.gridx = 0;
+		gbc_lblNewLabel_1.gridy = 1;
+		panelMain.add(lblNewLabel_1, gbc_lblNewLabel_1);
+
+		textField_1 = new JTextField();
+		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
+		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField_1.gridx = 1;
+		gbc_textField_1.gridy = 1;
+		panelMain.add(textField_1, gbc_textField_1);
+		textField_1.setColumns(10);
+
+		// 余白用のパネル
+		JPanel hogePanel = new JPanel();
+		hogePanel.setBorder(null);
+		getContentPane().add(hogePanel, BorderLayout.NORTH);
 	}
 
-	public TableModel showFrame(TableModel model) {
+	class prevButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
 
-		// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// ↑これを書くとAddressBookまで閉じてしまうので書かない
-
-		this.model = model;
-		setVisible(true);
-		return model;
+		}
 	}
+
+	class nextButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
+
+		}
+	}
+
+	class entryButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
+
+		}
+	}
+
+	class deleteButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
+
+		}
+	}
+
+	private void update() {
+		
+	}
+
+	private void showData() {
+
+	}
+
+	private void prevData() {
+
+	}
+
+	private void nextData() {
+
+	}
+
+
 }
