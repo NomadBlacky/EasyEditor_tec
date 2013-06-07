@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.JButton;
@@ -36,7 +38,7 @@ public class AddressBook extends JFrame {
 		toolBar.add(btnLoad);
 
 		JButton btnSave = new JButton("  Save  ");
-//		btnSave.addActionListener(new SaveButtonAction());
+		btnSave.addActionListener(new SaveButtonAction());
 		toolBar.add(btnSave);
 
 		JButton btnEdit = new JButton("  Edit  ");
@@ -55,13 +57,7 @@ public class AddressBook extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		model = new DefaultTableModel() {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				// すべてのセルを編集不可にする
-				return false;
-			}
-		};
+		model = new UnEditableTableModel();
 
 		table = new JTable(model);
 		// 列の入れ替えを不可にする
@@ -100,7 +96,11 @@ public class AddressBook extends JFrame {
 						scan.close();
 						return;
 					}
-
+					
+					// 表をクリアする
+					model.setRowCount(0);
+					model.setColumnCount(0);
+					
 					// 先頭行を列見出しとして列を作成
 					colName = scan.nextLine().split(delm);
 					for (String s : colName) {
@@ -131,8 +131,6 @@ public class AddressBook extends JFrame {
 	}
 
 
-/*
-
 // "Save"ボタン押下時 --------------------------------------------------
 
 	class SaveButtonAction implements ActionListener {
@@ -141,6 +139,7 @@ public class AddressBook extends JFrame {
 
 			// ファイル選択ダイアログを表示
 			JFileChooser jChooser = new JFileChooser();
+			jChooser.setCurrentDirectory(new File("."));
 			int selected = jChooser.showSaveDialog(null);
 
 			// 「保存」ボタン押下時
@@ -159,18 +158,41 @@ public class AddressBook extends JFrame {
 						return;
 					}
 				}
+
 				try {
-					// テキストフィールドの内容を書き込む
+					// テーブルの内容を書き込む
 					FileWriter fw = new FileWriter(file);
-					fw.write(textPane.getText());
+					StringBuilder tableText = new StringBuilder();
+					
+					for(int i = 0; i < model.getColumnCount(); i++) {
+						tableText.append(model.getColumnName(i));
+						if (!(i >= model.getColumnCount() - 1)) {
+							tableText.append(",");
+						}
+					}
+					tableText.append("\n");
+					
+					for (int y = 0; y < model.getRowCount(); y++) {
+						for (int x = 0; x < model.getColumnCount(); x++) {
+							Object line = model.getValueAt(y, x);
+							if(line != null) {
+								tableText.append(line);
+							}
+							if (!(x >= model.getColumnCount() - 1)) {
+								tableText.append(",");
+							}
+						}
+						tableText.append("\n");
+					}
+					fw.write(tableText.toString());
 					fw.close();
-				} catch (IOException e1) {
-					JOptionPane.showMessageDialog(null, "保存に失敗しました。", "エラー", JOptionPane.WARNING_MESSAGE);
+					
+				} catch (IOException e2) {
+					// TODO
 				}
+			
 			}
 		}
 	}
-
-*/
 
 }

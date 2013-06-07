@@ -5,6 +5,9 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -12,39 +15,39 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.table.TableModel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.border.BevelBorder;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import java.awt.GridLayout;
+import javax.swing.table.TableModel;
 
 public class EditFrame extends JFrame {
 
 	private TableModel model;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JPanel mainPanel;
 
 	public EditFrame(TableModel tmodel) {
-		this.setSize(500,300);
+		
+		model = tmodel;
+		
+		this.setBounds(200, 200, 600, 400);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.SOUTH);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		JButton btnPrev = new JButton("←戻る(B)");
+		JButton btnPrev = new JButton("↑戻る(B)");
+		btnPrev.addActionListener(new PrevButtonAction());
 		panel.add(btnPrev);
 
-		JButton btnNext = new JButton("次へ→(N)");
+		JButton btnNext = new JButton("次へ↓(N)");
+		btnNext.addActionListener(new NextButtonAction());
 		panel.add(btnNext);
 
 		JButton btnEntry = new JButton("新規登録(S)");
+		btnEntry.addActionListener(new EntryButtonAction());
 		panel.add(btnEntry);
 
 		JButton btnDelete = new JButton("削除(D)");
+		btnDelete.addActionListener(new DeleteButtonAction());
 		panel.add(btnDelete);
 
 		JButton btnExit = new JButton("終了(E)");
@@ -58,50 +61,17 @@ public class EditFrame extends JFrame {
 		JScrollPane scrollPane = new JScrollPane();
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
-		JPanel panelMain = new JPanel();
-		panelMain.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		scrollPane.setViewportView(panelMain);
+		mainPanel = new JPanel();
+		mainPanel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		scrollPane.setViewportView(mainPanel);
 		GridBagLayout gbl_panelMain = new GridBagLayout();
 		gbl_panelMain.columnWidths = new int[]{0, 0, 0};
 		gbl_panelMain.rowHeights = new int[]{0, 0, 0};
 		gbl_panelMain.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		gbl_panelMain.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
-		panelMain.setLayout(gbl_panelMain);
-
-		JLabel lblNewLabel = new JLabel("New label");
-		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
-		gbc_lblNewLabel.ipady = 2;
-		gbc_lblNewLabel.ipadx = 2;
-		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
-		gbc_lblNewLabel.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel.gridx = 0;
-		gbc_lblNewLabel.gridy = 0;
-		panelMain.add(lblNewLabel, gbc_lblNewLabel);
-
-		textField = new JTextField();
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.insets = new Insets(0, 0, 5, 0);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 1;
-		gbc_textField.gridy = 0;
-		panelMain.add(textField, gbc_textField);
-		textField.setColumns(10);
-
-		JLabel lblNewLabel_1 = new JLabel("New label");
-		GridBagConstraints gbc_lblNewLabel_1 = new GridBagConstraints();
-		gbc_lblNewLabel_1.anchor = GridBagConstraints.EAST;
-		gbc_lblNewLabel_1.insets = new Insets(0, 0, 0, 5);
-		gbc_lblNewLabel_1.gridx = 0;
-		gbc_lblNewLabel_1.gridy = 1;
-		panelMain.add(lblNewLabel_1, gbc_lblNewLabel_1);
-
-		textField_1 = new JTextField();
-		GridBagConstraints gbc_textField_1 = new GridBagConstraints();
-		gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField_1.gridx = 1;
-		gbc_textField_1.gridy = 1;
-		panelMain.add(textField_1, gbc_textField_1);
-		textField_1.setColumns(10);
+		mainPanel.setLayout(gbl_panelMain);
+		
+		init();
 
 		// 余白用のパネル
 		JPanel hogePanel = new JPanel();
@@ -109,7 +79,21 @@ public class EditFrame extends JFrame {
 		getContentPane().add(hogePanel, BorderLayout.NORTH);
 	}
 
-	class prevButtonAction implements ActionListener {
+	class PrevButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			prevData();
+		}
+	}
+
+	class NextButtonAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			nextData();
+		}
+	}
+
+	class EntryButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO 自動生成されたメソッド・スタブ
@@ -117,32 +101,70 @@ public class EditFrame extends JFrame {
 		}
 	}
 
-	class nextButtonAction implements ActionListener {
+	class DeleteButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO 自動生成されたメソッド・スタブ
 
 		}
 	}
+	
+	private ArrayList<JTextField> textFields = new ArrayList<>();
+	private int nowDataRow = 0;
+	
+	public int getNowDataRow() {
+		return nowDataRow;
+	}
+	
+	private void init() {
 
-	class entryButtonAction implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
-
+		for(int i = 0; i < model.getColumnCount(); i++) {
+			
+			JLabel label = new JLabel(model.getColumnName(i));
+			GridBagConstraints labelGbc = new GridBagConstraints();
+			labelGbc.ipady = 2;
+			labelGbc.ipadx = 2;
+			labelGbc.insets = new Insets(5, 5, 5, 5);
+			labelGbc.anchor = GridBagConstraints.EAST;
+			labelGbc.gridx = 0;
+			labelGbc.gridy = i;
+			mainPanel.add(label, labelGbc);
+			
+			JTextField textField = new JTextField((String)model.getValueAt(nowDataRow, i));
+			textFields.add(textField);
+			GridBagConstraints textGbc = new GridBagConstraints();
+			textGbc.ipady = 2;
+			textGbc.ipadx = 2;
+			textGbc.insets = new Insets(5, 5, 5, 5);
+			textGbc.fill = GridBagConstraints.HORIZONTAL;
+			textGbc.gridx = 1;
+			textGbc.gridy = i;
+			mainPanel.add(textField, textGbc);
+			textField.setColumns(10);
 		}
+
 	}
 
-	class deleteButtonAction implements ActionListener {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
-
-		}
-	}
-
-	private void update() {
+	public void update(int nextIndex) {
 		
+		if(nextIndex < 0 || nextIndex >= model.getRowCount()) {
+			return;
+		}
+		
+		// 編集したデータをテーブルに更新
+		for(int i = 0; i < model.getColumnCount(); i++) {
+			String text = textFields.get(i).getText();
+			model.setValueAt(text, nowDataRow, i);
+		}
+		
+		// 次に編集するデータをテキストフィールドに表示
+		for(int i = 0; i < model.getColumnCount(); i++) {
+			String text = (String)model.getValueAt(nextIndex, i);
+			textFields.get(i).setText(text);
+		}
+		
+		// 表示が完了したら現在のインデックスを更新
+		nowDataRow = nextIndex;
 	}
 
 	private void showData() {
@@ -151,10 +173,17 @@ public class EditFrame extends JFrame {
 
 	private void prevData() {
 
+		if(nowDataRow > 0) {
+			update(nowDataRow - 1);
+		}
+
 	}
 
 	private void nextData() {
 
+		if(nowDataRow < model.getRowCount()) {
+			update(nowDataRow + 1);
+		}
 	}
 
 
