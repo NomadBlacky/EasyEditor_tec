@@ -105,8 +105,8 @@ public class EditFrame extends JFrame {
 	class DeleteButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
-			model.removeRow(nowDataRow);
+
+			deleteData();
 		}
 	}
 	
@@ -170,7 +170,33 @@ public class EditFrame extends JFrame {
 		return true;
 	}
 
-	private void showData() {
+	public boolean showData(int index) {
+
+		if(index < 0 || index >= model.getRowCount()) {
+			return false;
+		}
+		
+		for(int i = 0; i < model.getColumnCount(); i++) {
+			String text = (String)model.getValueAt(index, i);
+			textFields.get(i).setText(text);
+		}
+		
+		nowDataRow = index;
+		return true;
+	}
+	
+	public void deleteData() {
+		
+		if(model.getRowCount() == 0) {
+			return;
+		}
+		
+		model.removeRow(nowDataRow);
+		if(!showData(nowDataRow)) {
+			for (JTextField text : textFields) {
+				text.setText("");
+			}
+		}
 
 	}
 
