@@ -16,14 +16,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 public class EditFrame extends JFrame {
 
-	private TableModel model;
+	private DefaultTableModel model;
 	private JPanel mainPanel;
 
-	public EditFrame(TableModel tmodel) {
+	public EditFrame(DefaultTableModel tmodel) {
 		
 		model = tmodel;
 		
@@ -105,7 +106,7 @@ public class EditFrame extends JFrame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO 自動生成されたメソッド・スタブ
-
+			model.removeRow(nowDataRow);
 		}
 	}
 	
@@ -145,10 +146,10 @@ public class EditFrame extends JFrame {
 
 	}
 
-	public void update(int nextIndex) {
+	public boolean update(int nextIndex) {
 		
 		if(nextIndex < 0 || nextIndex >= model.getRowCount()) {
-			return;
+			return false;
 		}
 		
 		// 編集したデータをテーブルに更新
@@ -165,25 +166,23 @@ public class EditFrame extends JFrame {
 		
 		// 表示が完了したら現在のインデックスを更新
 		nowDataRow = nextIndex;
+		
+		return true;
 	}
 
 	private void showData() {
 
 	}
 
-	private void prevData() {
+	private boolean prevData() {
 
-		if(nowDataRow > 0) {
-			update(nowDataRow - 1);
-		}
+		return update(nowDataRow - 1);
 
 	}
 
-	private void nextData() {
+	private boolean nextData() {
 
-		if(nowDataRow < model.getRowCount()) {
-			update(nowDataRow + 1);
-		}
+		return update(nowDataRow + 1);
 	}
 
 
