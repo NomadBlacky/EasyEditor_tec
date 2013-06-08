@@ -146,9 +146,10 @@ public class EditFrame extends JFrame {
 
 	}
 
-	public boolean update(int nextIndex) {
+	// 編集されたデータを更新したのち、指定した行のデータを表示する。
+	public boolean update(int showRow) {
 		
-		if(nextIndex < 0 || nextIndex >= model.getRowCount()) {
+		if(showRow < 0 || showRow >= model.getRowCount()) {
 			return false;
 		}
 		
@@ -160,28 +161,29 @@ public class EditFrame extends JFrame {
 		
 		// 次に編集するデータをテキストフィールドに表示
 		for(int i = 0; i < model.getColumnCount(); i++) {
-			String text = (String)model.getValueAt(nextIndex, i);
+			String text = (String)model.getValueAt(showRow, i);
 			textFields.get(i).setText(text);
 		}
 		
 		// 表示が完了したら現在のインデックスを更新
-		nowDataRow = nextIndex;
+		nowDataRow = showRow;
 		
 		return true;
 	}
 
-	public boolean showData(int index) {
+	// 指定した行のデータを表示する
+	public boolean showData(int showRow) {
 
-		if(index < 0 || index >= model.getRowCount()) {
+		if(showRow < 0 || showRow >= model.getRowCount()) {
 			return false;
 		}
 		
 		for(int i = 0; i < model.getColumnCount(); i++) {
-			String text = (String)model.getValueAt(index, i);
+			String text = (String)model.getValueAt(showRow, i);
 			textFields.get(i).setText(text);
 		}
 		
-		nowDataRow = index;
+		nowDataRow = showRow;
 		return true;
 	}
 	
