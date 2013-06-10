@@ -96,17 +96,18 @@ public class AddressBook extends JFrame {
 						scan.close();
 						return;
 					}
-					
+
 					// 表をクリアする
 					model.setRowCount(0);
 					model.setColumnCount(0);
-					
+
 					// 先頭行を列見出しとして列を作成
 					colName = scan.nextLine().split(delm);
 					for (String s : colName) {
 						model.addColumn(s);
 					}
 
+					// セルに値を設定する
 					while (scan.hasNext()) {
 						String[] line = scan.nextLine().split(delm);
 						int nowCol = model.getColumnCount();
@@ -163,34 +164,47 @@ public class AddressBook extends JFrame {
 					// テーブルの内容を書き込む
 					FileWriter fw = new FileWriter(file);
 					StringBuilder tableText = new StringBuilder();
-					
+
+					// 列名を書き込む
 					for(int i = 0; i < model.getColumnCount(); i++) {
+
 						tableText.append(model.getColumnName(i));
+						
+						// 最後の要素の後ろにカンマをつけない
 						if (!(i >= model.getColumnCount() - 1)) {
 							tableText.append(",");
 						}
 					}
 					tableText.append("\n");
-					
+
+					// テーブル内容を書き込む
 					for (int y = 0; y < model.getRowCount(); y++) {
 						for (int x = 0; x < model.getColumnCount(); x++) {
+							
+							// セルの内容を取得
+							// キャストなしでも問題なく動くため、あえてキャストしない。
 							Object line = model.getValueAt(y, x);
+							
+							// 空のセルをnullと書き込まれるのを防ぐ
 							if(line != null) {
 								tableText.append(line);
 							}
+							// 最後の要素の後ろにカンマをつけない
 							if (!(x >= model.getColumnCount() - 1)) {
 								tableText.append(",");
 							}
 						}
 						tableText.append("\n");
 					}
+					
+					// テキストをまとめて書き込む
 					fw.write(tableText.toString());
 					fw.close();
-					
+
 				} catch (IOException e2) {
-					// TODO
+					JOptionPane.showMessageDialog(null, "保存に失敗しました。", "エラー", JOptionPane.WARNING_MESSAGE);
 				}
-			
+
 			}
 		}
 	}
