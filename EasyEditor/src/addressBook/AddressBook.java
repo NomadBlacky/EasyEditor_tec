@@ -2,6 +2,8 @@ package addressBook;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,12 +20,14 @@ import javax.swing.JToolBar;
 import javax.swing.table.DefaultTableModel;
 
 
-public class AddressBook extends JFrame {
+public class AddressBook extends JFrame implements MouseListener {
 
 	private JTable table;
 	private DefaultTableModel model;
 	/** 区切り文字(delimiter) */
 	private String delm = ",";
+
+	EditFrame editFrame;
 
 	public AddressBook() {
 
@@ -46,10 +50,13 @@ public class AddressBook extends JFrame {
 
 			// 編集用ウィンドウを表示する
 			public void actionPerformed(ActionEvent e) {
-				EditFrame editFrame = new EditFrame(model);
-				// editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				// ↑これを書くと呼び出し元のフレームまで閉じてしまう(プログラムが終了する)ので書かない
-				editFrame.setVisible(true);
+
+				if (!editFrame.isVisible()) {
+					editFrame.setVisible(true);
+				}
+				else {
+					editFrame.setFocusableWindowState(true);
+				}
 			}
 		});
 
@@ -58,6 +65,9 @@ public class AddressBook extends JFrame {
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 
 		model = new UnEditableTableModel();
+		editFrame = new EditFrame(model);
+		// editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		// ↑これを書くと呼び出し元のフレームまで閉じてしまう(プログラムが終了する)ので書かない
 
 		table = new JTable(model);
 		// 列の入れ替えを不可にする
@@ -66,6 +76,7 @@ public class AddressBook extends JFrame {
 		table.setAutoCreateRowSorter(true);
 		scrollPane.setViewportView(table);
 
+		openFile(new File("./AddressBook.csv"));
 	}
 
 // "Open"ボタン押下時 --------------------------------------------------
@@ -86,49 +97,56 @@ public class AddressBook extends JFrame {
 				File file = jChooser.getSelectedFile();
 				setTitle(String.format("%s - %s", file.getName(), file.getPath()));
 
-				try {
-					// ファイルを読み込む
-					Scanner scan = new Scanner(file);
-					String[] colName = null;
-
-					if(!scan.hasNext()) {
-						// 空ファイルなら抜ける
-						scan.close();
-						return;
-					}
-
-					// 表をクリアする
-					model.setRowCount(0);
-					model.setColumnCount(0);
-
-					// 先頭行を列見出しとして列を作成
-					colName = scan.nextLine().split(delm);
-					for (String s : colName) {
-						model.addColumn(s);
-					}
-
-					// セルに値を設定する
-					while (scan.hasNext()) {
-						String[] line = scan.nextLine().split(delm);
-						int nowCol = model.getColumnCount();
-						if(line.length > nowCol) {
-							// 列が足りなければ追加する
-							for(int i = nowCol; i < line.length; i++) {
-								model.addColumn(null);
-							}
-						}
-						// データ一件追加
-						model.addRow(line);
-					}
-
-					scan.close();
-
-				} catch (FileNotFoundException e1) {
-					JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
-					setTitle("AddressBook");
-				}
+				openFile(file);
 			}
 		}
+	}
+
+	private void openFile(File file) {
+
+		try {
+			// ファイルを読み込む
+			Scanner scan = new Scanner(file);
+			String[] colName = null;
+
+			if(!scan.hasNext()) {
+				// 空ファイルなら抜ける
+				scan.close();
+				return;
+			}
+
+			// 表をクリアする
+			model.setRowCount(0);
+			model.setColumnCount(0);
+
+			// 先頭行を列見出しとして列を作成
+			colName = scan.nextLine().split(delm);
+			for (String s : colName) {
+				model.addColumn(s);
+			}
+
+			// セルに値を設定する
+			while (scan.hasNext()) {
+				String[] line = scan.nextLine().split(delm);
+				int nowCol = model.getColumnCount();
+				if(line.length > nowCol) {
+					// 列が足りなければ追加する
+					for(int i = nowCol; i < line.length; i++) {
+						model.addColumn(null);
+					}
+				}
+				// データ一件追加
+				model.addRow(line);
+			}
+
+			editFrame = new EditFrame(model);
+			scan.close();
+
+		} catch (FileNotFoundException e1) {
+			JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
+			setTitle("AddressBook");
+		}
+
 	}
 
 
@@ -169,7 +187,7 @@ public class AddressBook extends JFrame {
 					for(int i = 0; i < model.getColumnCount(); i++) {
 
 						tableText.append(model.getColumnName(i));
-						
+
 						// 最後の要素の後ろにカンマをつけない
 						if (!(i >= model.getColumnCount() - 1)) {
 							tableText.append(",");
@@ -180,11 +198,11 @@ public class AddressBook extends JFrame {
 					// テーブル内容を書き込む
 					for (int y = 0; y < model.getRowCount(); y++) {
 						for (int x = 0; x < model.getColumnCount(); x++) {
-							
+
 							// セルの内容を取得
 							// キャストなしでも問題なく動くため、あえてキャストしない。
 							Object line = model.getValueAt(y, x);
-							
+
 							// 空のセルをnullと書き込まれるのを防ぐ
 							if(line != null) {
 								tableText.append(line);
@@ -196,7 +214,7 @@ public class AddressBook extends JFrame {
 						}
 						tableText.append("\n");
 					}
-					
+
 					// テキストをまとめて書き込む
 					fw.write(tableText.toString());
 					fw.close();
@@ -208,5 +226,25 @@ public class AddressBook extends JFrame {
 			}
 		}
 	}
+
+// -------------------------------------------------------
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {}
 
 }

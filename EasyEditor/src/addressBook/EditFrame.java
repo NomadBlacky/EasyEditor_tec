@@ -106,8 +106,8 @@ public class EditFrame extends JFrame {
 	class EntryButtonAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO 自動生成されたメソッド・スタブ
 
+			entryData();
 		}
 	}
 
@@ -204,6 +204,11 @@ public class EditFrame extends JFrame {
 		nowDataRow = showRow;
 		return true;
 	}
+	
+	private void entryData() {
+		
+		
+	}
 
 	private void deleteData() {
 
@@ -215,12 +220,20 @@ public class EditFrame extends JFrame {
 		// 現在行を削除
 		model.removeRow(nowDataRow);
 
-		if(!showData(nowDataRow)) {
-			// 最後の1行を削除したら、テキストフィールドに空白を代入
+		// 削除された行の次にあたる行を表示する
+		// 最終行を削除した場合、IndexOutOfBoundsするので、
+		// 右辺の(nowDataRow - 1)を実行する。
+		// &&演算子は、左辺がfalseだった場合、右辺は実行されない。
+		
+		if(!showData(nowDataRow) && !showData(nowDataRow - 1)) {
+			// 削除したのちテーブルが空なら、テキストフィールドを編集不可にする。
 			for (JTextField text : textFields) {
+				text.setEditable(false);
 				text.setText("");
 			}
 		}
+		
+		
 
 	}
 

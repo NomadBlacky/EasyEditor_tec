@@ -6,7 +6,9 @@ public class UnEditableTableModel extends DefaultTableModel {
 
 	@Override
 	public boolean isCellEditable(int row, int column) {
-		// すべてのセルを編集不可にする
+		// すべてのセルを直接編集不可にする
 		return false;
 	}
+
+
 }
