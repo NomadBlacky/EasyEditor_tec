@@ -55,7 +55,7 @@ public class AddressBook extends JFrame implements MouseListener {
 					editFrame.setVisible(true);
 				}
 				else {
-					editFrame.setFocusableWindowState(true);
+					editFrame.toFront();
 				}
 			}
 		});
@@ -74,6 +74,8 @@ public class AddressBook extends JFrame implements MouseListener {
 		table.getTableHeader().setReorderingAllowed(false);
 		// 列見出しをクリックでソートを有効にする
 		table.setAutoCreateRowSorter(true);
+		table.addMouseListener(this);
+
 		scrollPane.setViewportView(table);
 
 		openFile(new File("./AddressBook.csv"));
@@ -143,7 +145,7 @@ public class AddressBook extends JFrame implements MouseListener {
 			scan.close();
 
 		} catch (FileNotFoundException e1) {
-			JOptionPane.showMessageDialog(null, "ファイルが見つかりません。", "エラー", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, file.getName().concat("が見つかりません。"), "エラー", JOptionPane.WARNING_MESSAGE);
 			setTitle("AddressBook");
 		}
 
@@ -227,11 +229,19 @@ public class AddressBook extends JFrame implements MouseListener {
 		}
 	}
 
-// -------------------------------------------------------
+// MouseListener -------------------------------------------------------
 
+	@Override
+	public void mouseClicked(MouseEvent e) {}
+
+	// セルをクリックで選択したとき
 	@Override
 	public void mousePressed(MouseEvent e) {
 
+		// 選択した行をEditFrameと同期する
+		int row = table.getSelectedRow();
+		editFrame.showData(table.convertRowIndexToModel(row));
+		editFrame.toFront();
 
 	}
 
@@ -243,8 +253,5 @@ public class AddressBook extends JFrame implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {}
 
 }
