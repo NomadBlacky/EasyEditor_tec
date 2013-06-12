@@ -13,7 +13,6 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -78,6 +77,7 @@ public class AddressBook extends JFrame implements MouseListener {
 
 		scrollPane.setViewportView(table);
 
+		// アドレス帳データを読み込む
 		openFile(new File("./AddressBook.csv"));
 	}
 
@@ -145,7 +145,7 @@ public class AddressBook extends JFrame implements MouseListener {
 			scan.close();
 
 		} catch (FileNotFoundException e1) {
-			JOptionPane.showMessageDialog(null, file.getName().concat("が見つかりません。"), "エラー", JOptionPane.WARNING_MESSAGE);
+			Dialogs.showWaringDialog(file.getName().concat("が見つかりません。"), "エラー");
 			setTitle("AddressBook");
 		}
 
@@ -171,10 +171,11 @@ public class AddressBook extends JFrame implements MouseListener {
 
 				// ファイルが存在する（上書き保存の）場合
 				if(file.exists()) {
-					// 確認メッセージを表示
-					int opt = JOptionPane.showConfirmDialog(null, file.getName().concat("はすでに存在します。上書きしますか？"),
-							"上書き保存", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-					if(opt != JOptionPane.OK_OPTION) {
+
+					// 確認ダイアログを表示
+					int opt = Dialogs.showQuestionDialog(
+							file.getName().concat("はすでに存在します。上書きしますか？"), "上書き保存");
+					if(opt != Dialogs.OK_OPTION) {
 						// OK が選択されなければ何もしない
 						return;
 					}
@@ -222,7 +223,7 @@ public class AddressBook extends JFrame implements MouseListener {
 					fw.close();
 
 				} catch (IOException e2) {
-					JOptionPane.showMessageDialog(null, "保存に失敗しました。", "エラー", JOptionPane.WARNING_MESSAGE);
+					Dialogs.showWaringDialog("保存に失敗しました。", "エラー");
 				}
 
 			}
